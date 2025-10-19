@@ -12,26 +12,40 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose'
 import { StudentModule } from './student/student.module';
 import { AdminModule } from './admin/admin.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { BookModule } from './book/book.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
 
 @Module({
   imports: [
-    EmployeeModule,
+    // === CORE MODULES ===
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.DATABASE_URL!),
-    StudentModule,
-    AdminModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: process.env.SUPABASE,
-      autoLoadEntities: true,
-      synchronize: true
+
+    // === GraphQL Setup ===
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      sortSchema: true,
+      playground: true,
     }),
-    AuthModule,  // ← Keep this
+
+    // === MODULES USING GraphQL + MongoDB ===
+    BookModule,  // ✅ Uses GraphQL with Mongoose
+
+    // === MODULES USING OTHER ORMs (TypeORM, etc.) ===
+    // ❌ COMMENTED OUT - Requires TypeOrmModule.forRoot() configuration
+    // StudentModule,  // Uses TypeORM
+    // AdminModule,    // Uses TypeORM
+    // AuthModule,     // Uses TypeORM
+
+    // === MODULES USING REST APIs ===
+    // EmployeeModule, // Uses REST endpoints
   ],
-  controllers: [AppController, UserController, ProductController, DatabaseController],  // ← Removed AuthController
-  providers: [AppService, ProductService, DatabaseService],  // ← Removed AuthService
+  controllers: [AppController, UserController, ProductController, DatabaseController],
+  providers: [AppService, ProductService, DatabaseService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
