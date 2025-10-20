@@ -19,7 +19,7 @@ export class DatabaseService implements OnModuleInit, OnApplicationShutdown {
   }
 
   getDbUrl() {
-    console.log(this.configService.get<string>('DATABASE_URL'));
-    return this.configService.get<string>('DATABASE_URL');
+    console.log(this.configService.get<string>('DATABASE_URL2'));
+    return this.configService.get<string>('DATABASE_URL2');
   }
 }

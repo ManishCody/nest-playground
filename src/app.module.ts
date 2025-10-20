@@ -17,12 +17,15 @@ import { BookModule } from './book/book.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { PrismaModule } from './prisma/prisma.module';
+import { CricketerService } from './cricketer/cricketer.service';
+import { CricketerModule } from './cricketer/cricketer.module';
 
 @Module({
   imports: [
     // === CORE MODULES ===
     ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRoot(process.env.DATABASE_URL!),
+    MongooseModule.forRoot(process.env.DATABASE_URL2!),
 
     // === GraphQL Setup ===
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -32,8 +35,15 @@ import { join } from 'path';
       playground: true,
     }),
 
+    // === Prisma SetUp === 
+    
+
     // === MODULES USING GraphQL + MongoDB ===
-    BookModule,  // ✅ Uses GraphQL with Mongoose
+    BookModule,
+
+    PrismaModule,
+
+    CricketerModule, 
 
     // === MODULES USING OTHER ORMs (TypeORM, etc.) ===
     // ❌ COMMENTED OUT - Requires TypeOrmModule.forRoot() configuration
@@ -45,7 +55,7 @@ import { join } from 'path';
     // EmployeeModule, // Uses REST endpoints
   ],
   controllers: [AppController, UserController, ProductController, DatabaseController],
-  providers: [AppService, ProductService, DatabaseService],
+  providers: [AppService, ProductService, DatabaseService, CricketerService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

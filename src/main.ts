@@ -11,7 +11,7 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
     }),
-    new UppercasePipe()
+    // new UppercasePipe()
   );
 
   await app.listen(process.env.PORT ?? 3000);

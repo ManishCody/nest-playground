@@ -15,15 +15,50 @@ input CreateBookInput {
   title: String!
 }
 
+input CreateCricketerInput {
+  battingStyle: String
+  bowlingStyle: String
+  country: String!
+  matches: Int
+  name: String!
+  role: String!
+  runs: Int
+  wickets: Int
+}
+
+type Cricketer {
+  battingStyle: String
+  bowlingStyle: String
+  country: String!
+  createdAt: DateTime!
+  id: String!
+  matches: Int
+  name: String!
+  role: String!
+  runs: Int
+  updatedAt: DateTime!
+  wickets: Int
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Mutation {
   createBook(input: CreateBookInput!): Book!
+  createCricketer(data: CreateCricketerInput!): Cricketer!
   deleteBook(id: String!): Book!
+  removeCricketer(id: String!): Cricketer!
   updateBook(input: UpdateBookInput!): Book!
+  updateCricketer(data: UpdateCricketerInput!): Cricketer!
 }
 
 type Query {
   getAllBooks: [Book!]!
+  getAllCricketers: [Cricketer!]!
   getBook(id: String!): Book!
+  getCricketer(id: String!): Cricketer!
 }
 
 input UpdateBookInput {
@@ -31,4 +66,16 @@ input UpdateBookInput {
   description: String
   id: ID!
   title: String
+}
+
+input UpdateCricketerInput {
+  battingStyle: String
+  bowlingStyle: String
+  country: String
+  id: String!
+  matches: Int
+  name: String
+  role: String
+  runs: Int
+  wickets: Int
 }
