@@ -20,10 +20,24 @@ import { join } from 'path';
 import { PrismaModule } from './prisma/prisma.module';
 import { CricketerService } from './cricketer/cricketer.service';
 import { CricketerModule } from './cricketer/cricketer.module';
+import { seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
     // === CORE MODULES ===
+
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          name: 'default',
+          ttl: seconds(60),
+          limit: 3,
+        }
+      ],
+      errorMessage: 'Too mandy request !'
+    }),
+
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.DATABASE_URL2!),
 
@@ -36,14 +50,14 @@ import { CricketerModule } from './cricketer/cricketer.module';
     }),
 
     // === Prisma SetUp === 
-    
+
 
     // === MODULES USING GraphQL + MongoDB ===
     BookModule,
 
     PrismaModule,
 
-    CricketerModule, 
+    CricketerModule,
 
     // === MODULES USING OTHER ORMs (TypeORM, etc.) ===
     // ❌ COMMENTED OUT - Requires TypeOrmModule.forRoot() configuration
@@ -55,7 +69,12 @@ import { CricketerModule } from './cricketer/cricketer.module';
     // EmployeeModule, // Uses REST endpoints
   ],
   controllers: [AppController, UserController, ProductController, DatabaseController],
-  providers: [AppService, ProductService, DatabaseService, CricketerService],
+  providers: [AppService, ProductService, DatabaseService, CricketerService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    }
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
